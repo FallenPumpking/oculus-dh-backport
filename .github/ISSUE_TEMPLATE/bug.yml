@@ -1,0 +1,32 @@
+name: Bug report
+description: Crash, rendering defect, or compatibility problem
+labels: [bug]
+body:
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions and environment
+      description: Backport, Minecraft, Forge, DH, Embeddium, Java, shader, modpack, OS, GPU and driver.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include expected behavior, actual behavior, and whether a minimal copied instance reproduces it.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs and screenshots
+      description: Attach latest.log/crash report and screenshots. Remove tokens, private server addresses and personal paths first.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and reviewed the supported test combination.
+          required: true
+        - label: I am reporting this fork's behavior here, not asking upstream to support this build.
+          required: true

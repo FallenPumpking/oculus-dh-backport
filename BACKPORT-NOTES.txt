@@ -1,0 +1,9 @@
+Oculus DH Backport — public alpha packaging, modified 2026-10-25.
+See NOTICE.md for exact upstream snapshots and modification notices.
+See THIRD_PARTY_NOTICES.md and META-INF/licenses for component licenses.
+The combined distribution includes AGPL glsl-transformer; the private prototype's
+LGPL-only label was incomplete. Corresponding source and build scripts:
+https://github.com/FallenPumpking/oculus-dh-backport/releases
+Private prototype rendering was verified with DH 3.3.3 and Complementary r5.3.
+Public alpha acceptance remains in progress; see docs/TESTING.md in the source.
+This is not an official Oculus or Iris release.

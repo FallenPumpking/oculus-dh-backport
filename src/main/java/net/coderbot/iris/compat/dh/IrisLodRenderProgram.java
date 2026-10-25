@@ -1,0 +1,318 @@
+package net.coderbot.iris.compat.dh;
+
+import java.nio.FloatBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.lwjgl.opengl.GL11C;
+import org.lwjgl.opengl.GL15C;
+import org.lwjgl.opengl.GL20C;
+import org.lwjgl.opengl.GL30C;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.opengl.GL43C;
+import org.lwjgl.system.MemoryStack;
+
+import com.google.common.primitives.Ints;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.seibel.distanthorizons.api.enums.rendering.EDhApiRenderPass;
+import com.seibel.distanthorizons.api.interfaces.override.rendering.IDhApiShaderProgram;
+import com.seibel.distanthorizons.api.methods.events.sharedParameterObjects.DhApiRenderParam;
+import com.seibel.distanthorizons.api.objects.math.DhApiVec3f;
+
+import net.coderbot.iris.gl.IrisRenderSystem;
+import net.coderbot.iris.gl.blending.BlendMode;
+import net.coderbot.iris.gl.blending.BlendModeOverride;
+import net.coderbot.iris.gl.blending.BufferBlendOverride;
+import net.coderbot.iris.gl.program.ProgramImages;
+import net.coderbot.iris.gl.program.ProgramSamplers;
+import net.coderbot.iris.gl.program.ProgramUniforms;
+import net.coderbot.iris.gl.shader.GlShader;
+import net.coderbot.iris.gl.shader.ProgramCreator;
+import net.coderbot.iris.gl.shader.ShaderType;
+import net.coderbot.iris.pipeline.newshader.NewWorldRenderingPipeline;
+import net.coderbot.iris.pipeline.ShaderPrinter;
+import net.coderbot.iris.pipeline.SodiumTerrainPipeline;
+import net.coderbot.iris.pipeline.transform.PatchShaderType;
+import net.coderbot.iris.pipeline.transform.TransformPatcher;
+import net.coderbot.iris.shaderpack.ProgramSource;
+import net.coderbot.iris.uniforms.custom.CustomUniforms;
+import net.coderbot.iris.vendored.joml.Matrix4f;
+
+public final class IrisLodRenderProgram implements IDhApiShaderProgram {
+	private static final BlendModeOverride DEFAULT_TRANSLUCENT_BLEND = new BlendModeOverride(new BlendMode(
+		GL11C.GL_SRC_ALPHA, GL11C.GL_ONE_MINUS_SRC_ALPHA,
+		GL11C.GL_ONE, GL11C.GL_ONE_MINUS_SRC_ALPHA));
+
+	private final ProgramState solid;
+	private final ProgramState translucent;
+	private final int vao;
+	private final boolean separateVertexBinding;
+	private boolean vertexFormatInitialized;
+	private boolean loggedVertexBuffer;
+	private boolean loggedDistantOffset;
+	private final Matrix4f projectionInverseScratch = new Matrix4f();
+	private final Matrix4f modelViewInverseScratch = new Matrix4f();
+	private final Matrix4f normalMatrixScratch = new Matrix4f();
+	private final Matrix4f cullingMatrixScratch = new Matrix4f();
+	private final float[] cullingMatrix = new float[16];
+	private boolean cullingMatrixReady;
+	private ProgramState active;
+
+	private IrisLodRenderProgram(ProgramState solid, ProgramState translucent) {
+		this.solid = solid;
+		this.translucent = translucent;
+		this.active = solid;
+		this.vao = GL30C.glGenVertexArrays();
+		this.separateVertexBinding = GL.getCapabilities().OpenGL43
+			&& !Boolean.getBoolean("oculus.dh.legacyVertexBinding");
+	}
+
+	public static IrisLodRenderProgram create(ProgramSource terrain, Optional<ProgramSource> water,
+			NewWorldRenderingPipeline pipeline) {
+		ProgramState solid = ProgramState.create(terrain, pipeline.getSodiumTerrainPipeline());
+		ProgramState translucent = water.isPresent()
+			? ProgramState.create(water.get(), pipeline.getSodiumTerrainPipeline())
+			: solid;
+		return new IrisLodRenderProgram(solid, translucent);
+	}
+
+	@Override
+	public boolean overrideThisFrame() {
+		return DHCompat.isActive();
+	}
+
+	@Override
+	public int getId() {
+		return active.id;
+	}
+
+	@Override
+	public void free() {
+		solid.destroy();
+		if (translucent != solid) {
+			translucent.destroy();
+		}
+		GL30C.glDeleteVertexArrays(vao);
+	}
+
+	@Override
+	public void bind() {
+		active.bind();
+		GL30C.glBindVertexArray(vao);
+	}
+
+	@Override
+	public void unbind() {
+		GL30C.glBindVertexArray(0);
+		ProgramUniforms.clearActiveUniforms();
+		ProgramSamplers.clearActiveSamplers();
+		GlStateManager._glUseProgram(0);
+		BlendModeOverride.restore();
+	}
+
+	@Override
+	public void fillUniformData(DhApiRenderParam param) {
+		active = param.renderPass == EDhApiRenderPass.TRANSPARENT ? translucent : solid;
+		Matrix4f projection = DHCompat.createProjectionMatrix(param);
+		Matrix4f modelView = DHCompat.getModelViewMatrix(param);
+		cullingMatrixScratch.set(projection).mul(modelView).get(cullingMatrix);
+		cullingMatrixReady = param.renderPass == EDhApiRenderPass.OPAQUE;
+		projectionInverseScratch.set(projection).invert();
+		modelViewInverseScratch.set(modelView).invert();
+		normalMatrixScratch.set(modelViewInverseScratch).transpose();
+		DHCompat.updateRenderParameters(projection, projectionInverseScratch, modelView, modelViewInverseScratch,
+			param.nearClipPlane, param.farClipPlane);
+		active.bind();
+		GL30C.glBindVertexArray(vao);
+		active.updateResources();
+
+		setMatrix(active.projection, projection);
+		setMatrix(active.projectionInverse, projectionInverseScratch);
+		setMatrix(active.modelView, modelView);
+		setMatrix(active.modelViewInverse, modelViewInverseScratch);
+		setMatrix(active.normalMatrix, normalMatrixScratch);
+		setMatrix(active.dhProjection, projection);
+		setMatrix(active.dhProjectionInverse, projectionInverseScratch);
+		setFloat(active.worldYOffset, param.worldYOffset);
+		setFloat(active.microOffset, 0.01F);
+	}
+
+	@Override
+	public void setModelOffsetPos(DhApiVec3f pos) {
+		if (!loggedDistantOffset && (Math.abs(pos.x) > 256 || Math.abs(pos.z) > 256)) {
+			net.coderbot.iris.Iris.logger.info("DH shader terrain beyond 256 blocks: model offset [{}, {}, {}], program {}", pos.x, pos.y, pos.z, active.id);
+			loggedDistantOffset = true;
+		}
+		if (active.modelOffset != -1) {
+			GL20C.glUniform3f(active.modelOffset, pos.x, pos.y, pos.z);
+		}
+	}
+
+	/** Optional experimental consumer uses the exact matrices sent to this program.
+	 * Only the audited pack/pass is exposed; other shader semantics fail open. */
+	public float[] getConservativeCullingMatrix() {
+		return cullingMatrixReady
+			&& !net.coderbot.iris.shadows.ShadowRenderingState.areShadowsCurrentlyBeingRendered()
+			&& "ComplementaryReimagined_r5.8.1.zip".equals(net.coderbot.iris.Iris.getCurrentPackName())
+			? cullingMatrix : null;
+	}
+
+	@Override
+	public void bindVertexBuffer(int vbo) {
+		GL30C.glBindVertexArray(vao);
+		GL15C.glBindBuffer(GL15C.GL_ARRAY_BUFFER, vbo);
+		if (!loggedVertexBuffer) {
+			net.coderbot.iris.Iris.logger.info("DH shader vertex buffer bound: {} bytes, program {}", GL15C.glGetBufferParameteri(GL15C.GL_ARRAY_BUFFER, GL15C.GL_BUFFER_SIZE), active.id);
+			loggedVertexBuffer = true;
+		}
+		if (separateVertexBinding) {
+			if (!vertexFormatInitialized) {
+				// Format belongs to this privately owned VAO. Buffer storage may change,
+				// so always rebind the supplied buffer; do not cache VBO identities.
+				GL20C.glEnableVertexAttribArray(0);
+				GL20C.glEnableVertexAttribArray(1);
+				GL20C.glEnableVertexAttribArray(2);
+				GL43C.glVertexAttribIFormat(0, 4, GL20C.GL_UNSIGNED_SHORT, 0);
+				GL43C.glVertexAttribFormat(1, 4, GL20C.GL_UNSIGNED_BYTE, true, 8);
+				GL43C.glVertexAttribIFormat(2, 4, GL20C.GL_UNSIGNED_BYTE, 12);
+				GL43C.glVertexAttribBinding(0, 0);
+				GL43C.glVertexAttribBinding(1, 0);
+				GL43C.glVertexAttribBinding(2, 0);
+				vertexFormatInitialized = true;
+			}
+			GL43C.glBindVertexBuffer(0, vbo, 0L, 16);
+			return;
+		}
+		GL20C.glEnableVertexAttribArray(0);
+		GL20C.glEnableVertexAttribArray(1);
+		GL20C.glEnableVertexAttribArray(2);
+		GL30C.glVertexAttribIPointer(0, 4, GL20C.GL_UNSIGNED_SHORT, 16, 0L);
+		GL20C.glVertexAttribPointer(1, 4, GL20C.GL_UNSIGNED_BYTE, true, 16, 8L);
+		GL30C.glVertexAttribIPointer(2, 4, GL20C.GL_UNSIGNED_BYTE, 16, 12L);
+	}
+
+	private static void setFloat(int location, float value) {
+		if (location != -1) {
+			GL20C.glUniform1f(location, value);
+		}
+	}
+
+	private static void setMatrix(int location, Matrix4f matrix) {
+		if (location == -1) {
+			return;
+		}
+		try (MemoryStack stack = MemoryStack.stackPush()) {
+			FloatBuffer buffer = stack.mallocFloat(16);
+			matrix.get(buffer);
+			IrisRenderSystem.uniformMatrix4fv(location, false, buffer);
+		}
+	}
+
+	private static final class ProgramState {
+		private final int id;
+		private final ProgramUniforms uniforms;
+		private final ProgramSamplers samplers;
+		private final ProgramImages images;
+		private final BlendModeOverride blend;
+		private final List<BufferBlendOverride> bufferBlends;
+		private final int modelOffset;
+		private final int worldYOffset;
+		private final int microOffset;
+		private final int modelView;
+		private final int modelViewInverse;
+		private final int projection;
+		private final int projectionInverse;
+		private final int normalMatrix;
+		private final int dhProjection;
+		private final int dhProjectionInverse;
+		private CustomUniforms customUniforms;
+
+		private ProgramState(int id, ProgramUniforms uniforms, ProgramSamplers samplers, ProgramImages images,
+				ProgramSource source) {
+			this.id = id;
+			this.uniforms = uniforms;
+			this.samplers = samplers;
+			this.images = images;
+			this.blend = source.getDirectives().getBlendModeOverride().orElse(null);
+			this.bufferBlends = new ArrayList<>();
+			source.getDirectives().getBufferBlendOverrides().forEach(info -> {
+				int index = Ints.indexOf(source.getDirectives().getDrawBuffers(), info.getIndex());
+				if (index >= 0) {
+					bufferBlends.add(new BufferBlendOverride(index, info.getBlendMode()));
+				}
+			});
+			modelOffset = uniform("modelOffset");
+			worldYOffset = uniform("worldYOffset");
+			microOffset = uniform("mircoOffset");
+			modelView = uniform("iris_ModelViewMatrix");
+			modelViewInverse = uniform("iris_ModelViewMatrixInverse");
+			projection = uniform("iris_ProjectionMatrix");
+			projectionInverse = uniform("iris_ProjectionMatrixInverse");
+			normalMatrix = uniform("iris_NormalMatrix");
+			dhProjection = uniform("dhProjection");
+			dhProjectionInverse = uniform("dhProjectionInverse");
+		}
+
+		private static ProgramState create(ProgramSource source, SodiumTerrainPipeline pipeline) {
+			Map<PatchShaderType, String> transformed = TransformPatcher.patchDH(
+				source.getVertexSource().orElseThrow(IllegalStateException::new),
+				source.getGeometrySource().orElse(null),
+				source.getFragmentSource().orElseThrow(IllegalStateException::new));
+			String vertex = transformed.get(PatchShaderType.VERTEX);
+			String geometry = transformed.get(PatchShaderType.GEOMETRY);
+			String fragment = transformed.get(PatchShaderType.FRAGMENT);
+			ShaderPrinter.printProgram(source.getName() + "_dh").addSource(PatchShaderType.VERTEX, vertex).addSource(PatchShaderType.GEOMETRY, geometry).addSource(PatchShaderType.FRAGMENT, fragment).print();
+
+			GlShader vertexShader = new GlShader(ShaderType.VERTEX, source.getName() + "_dh.vsh", vertex);
+			GlShader fragmentShader = new GlShader(ShaderType.FRAGMENT, source.getName() + "_dh.fsh", fragment);
+			GlShader geometryShader = geometry == null ? null
+				: new GlShader(ShaderType.GEOMETRY, source.getName() + "_dh.gsh", geometry);
+			int id = geometryShader == null
+				? ProgramCreator.create(source.getName() + "_dh", vertexShader, fragmentShader)
+				: ProgramCreator.create(source.getName() + "_dh", vertexShader, geometryShader, fragmentShader);
+			vertexShader.destroy();
+			fragmentShader.destroy();
+			if (geometryShader != null) {
+				geometryShader.destroy();
+			}
+
+			ProgramUniforms.Builder builder = pipeline.initUniforms(id);
+			ProgramState state = new ProgramState(id, builder.buildUniforms(), pipeline.initTerrainSamplers(id),
+				pipeline.initTerrainImages(id), source);
+			state.customUniforms = pipeline.getCustomUniforms();
+			state.customUniforms.mapholderToPass(builder, state);
+			return state;
+		}
+
+		private int uniform(String name) {
+			return GL20C.glGetUniformLocation(id, name);
+		}
+
+		private void bind() {
+			GlStateManager._glUseProgram(id);
+			if (DHCompat.isTransparentPass()) {
+				(blend != null ? blend : DEFAULT_TRANSLUCENT_BLEND).apply();
+				for (BufferBlendOverride bufferBlend : bufferBlends) {
+					bufferBlend.apply();
+				}
+			} else {
+				// DH sets blend factors but leaves GL_BLEND unchanged. Opaque LODs must
+				// not inherit blending from the surrounding translucent render stage.
+				BlendModeOverride.OFF.apply();
+			}
+		}
+
+		private void updateResources() {
+			uniforms.update();
+			customUniforms.push(this);
+			samplers.update();
+			images.update();
+		}
+
+		private void destroy() {
+			GlStateManager.glDeleteProgram(id);
+		}
+	}
+}

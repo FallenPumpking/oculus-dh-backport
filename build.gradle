@@ -1,0 +1,102 @@
+plugins {
+	id 'dev.architectury.loom' version '1.2.377'
+	id 'maven-publish'
+}
+
+loom {
+    silentMojangMappingsLicense()
+	
+	forge {
+		mixinConfigs = [
+				"mixins.oculus.json",
+				"mixins.oculus.fantastic.json",
+				"mixins.oculus.vertexformat.json",
+				"mixins.oculus.bettermipmaps.json",
+				"mixins.oculus.fixes.maxfpscrash.json",
+				"oculus-batched-entity-rendering.mixins.json",
+				"mixins.oculus.compat.dh.json",
+				"mixins.oculus.compat.sodium.json",
+				"mixins.oculus.compat.indigo.json",
+				"mixins.oculus.compat.indium.json"
+		]
+	}
+	mixin.defaultRefmapName = "oculus-mixins-refmap.json"
+}
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+archivesBaseName = "${project.archives_base_name}-mc${project.minecraft_version}"
+version = project.mod_version
+group = project.maven_group
+
+repositories {
+	maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+	forge "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+	
+	modCompileOnly files("deps/embeddium-0.3.18+mc1.18.2.jar")
+	// The bridge uses DH's unmapped API/core types; do not remap its bundled loader mixins.
+	compileOnly files("deps/DistantHorizons-3.3.3-1.18.2-fabric-forge.jar")
+	//modCompileOnly "me.jellysquid.mods:Rubidium:0.6.3"
+}
+
+processResources {
+	inputs.property "version", project.version
+	from('LICENSE')
+    from('NOTICE.md')
+    from('THIRD_PARTY_NOTICES.md')
+    from('LICENSES') { into 'META-INF/licenses' }
+	from('BACKPORT-NOTES.txt')
+
+	filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
+
+java {
+	withSourcesJar()
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+
+	repositories {
+	}
+}
+
+// Compile against the target Java API even when Gradle itself uses JDK 21.
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
+    options.compilerArgs += ['-Xmaxerrs', '500']
+}
+
+sourceSets {
+    projectionTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += output + compileClasspath
+    }
+}
+def projectionTasks = ['ProjectionDepthCheck', 'ProjectionHistoryCheck'].collect { checkClass ->
+    tasks.register(checkClass, JavaExec) {
+        dependsOn tasks.named('projectionTestClasses')
+        classpath = sourceSets.projectionTest.runtimeClasspath
+        mainClass = "net.coderbot.iris.compat.dh.${checkClass}"
+    }
+}
+tasks.register('projectionChecks') { dependsOn projectionTasks }
+tasks.named('check') { dependsOn tasks.named('projectionChecks') }

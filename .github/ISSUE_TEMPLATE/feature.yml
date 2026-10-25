@@ -1,0 +1,11 @@
+name: Feature request
+description: Propose a scoped improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and proposed behavior
+      description: Include your use case, alternatives, and relevant versions.
+    validations:
+      required: true

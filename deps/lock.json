@@ -1,0 +1,12 @@
+[
+  {
+    "name": "embeddium-0.3.18+mc1.18.2.jar",
+    "url": "https://cdn.modrinth.com/data/sk9rgfiA/versions/xuVAgh89/embeddium-0.3.18%2Bmc1.18.2.jar",
+    "sha256": "7c14d289a85d7bb5cfeb61dd8674e7d02535e6ac9e1a1e2723f10323fbe59f99"
+  },
+  {
+    "name": "DistantHorizons-3.3.3-1.18.2-fabric-forge.jar",
+    "url": "https://cdn.modrinth.com/data/uCdwusMi/versions/tYRYS64l/DistantHorizons-3.3.3-1.18.2-fabric-forge.jar",
+    "sha256": "73e1b8dc88d3f6002736018a36953c4f59eb070cb826dd222cf3adecc3a45ad0"
+  }
+]

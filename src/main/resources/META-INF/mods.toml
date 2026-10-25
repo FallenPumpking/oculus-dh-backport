@@ -1,0 +1,44 @@
+modLoader="javafml"
+loaderVersion="[40,)"
+license="AGPL-3.0-only; retained component licenses in NOTICE.md"
+issueTrackerURL="https://github.com/FallenPumpking/oculus-dh-backport/issues"
+[[mods]]
+modId="oculus"
+version="${version}"
+displayName="Oculus DH Backport (Alpha)"
+displayURL="https://github.com/FallenPumpking/oculus-dh-backport"
+logoFile="oculus-logo.png"
+authors="coderbot, IMS212, Justsnoopy30, FoundationGames"
+credits="Oculus by Asek3; 1.19.2 base by Teqed; DH3 bridge by fangyu-mc. See BACKPORT-NOTES.txt for local modifications."
+description='''
+Experimental local backport for Minecraft 1.18.2, Forge and Distant Horizons 3.3.3.
+Based on Iris/Oculus and the fangyu-mc DH3 bridge. Not an official upstream release.
+'''
+
+[[dependencies.oculus]]
+modId="forge"
+mandatory=true
+versionRange="[40.3.11,)"
+side="BOTH"
+
+[mods."sodium:options"]
+"mixin.features.sky"=false
+[[dependencies.oculus]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.18.2]"
+side="BOTH"
+
+[[dependencies.oculus]]
+modId="distanthorizons"
+mandatory=false
+versionRange="[3.3.3]"
+ordering="BEFORE"
+side="CLIENT"
+
+[[dependencies.oculus]]
+modId="embeddium"
+mandatory=true
+versionRange="[0.3.18]"
+ordering="AFTER"
+side="CLIENT"
