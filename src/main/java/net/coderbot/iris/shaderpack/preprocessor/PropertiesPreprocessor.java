@@ -16,8 +16,32 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PropertiesPreprocessor {
+	/** Resolve conditionals before substituting property constants; never rewrite defined/ifdef operands. */
+	public static String preprocessSource(String source, ShaderPackOptions options,
+			Iterable<StringPair> environmentDefines, Iterable<StringPair> replacements) {
+		List<StringPair> defines = new ArrayList<>();
+		environmentDefines.forEach(defines::add);
+		Map<String, String> values = new HashMap<>();
+		for (StringPair pair : replacements) {
+			defines.add(pair);
+			if (!pair.getValue().isEmpty()) values.put(pair.getKey(), pair.getValue());
+		}
+		String processed = preprocessSource(source, options, defines);
+		// Property values are intentionally passed through the C preprocessor unchanged.
+		// Expand known environment constants once, as whole identifiers, after branch selection.
+		Matcher identifiers = Pattern.compile("[A-Za-z_][A-Za-z_0-9]*").matcher(processed);
+		StringBuffer result = new StringBuffer();
+		while (identifiers.find()) {
+			identifiers.appendReplacement(result, Matcher.quoteReplacement(values.getOrDefault(identifiers.group(), identifiers.group())));
+		}
+		identifiers.appendTail(result);
+		return result.toString();
+	}
+
 	// Derived from ShaderProcessor.glslPreprocessSource, which is derived from GlShader from Canvas, licenced under LGPL
 	public static String preprocessSource(String source, ShaderPackOptions shaderPackOptions, Iterable<StringPair> environmentDefines) {
 		if (source.contains(PropertyCollectingListener.PROPERTY_MARKER) || source.contains("IRIS_PASSTHROUGHBACKSLASH")) {

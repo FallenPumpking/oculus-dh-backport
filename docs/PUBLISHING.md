@@ -18,7 +18,7 @@ CurseForge or Modrinth automatically.
    Use alpha release type until broader acceptance. Add Embeddium 0.3.18 and
    Distant Horizons 3.3.3 as required dependencies for the advertised setup.
    Record Oculus/Iris/OptiFine as incompatible where supported, and document
-   Euphoria Patcher as unsupported. Shader packs are separate downloads.
+   the tested Euphoria Patcher/shader pair from README. Shader packs are separate downloads.
 7. Set source and issues links to this repository. Use the listing draft below,
    review its wording personally and include applicable AI disclosures.
 8. Upload the tested release and its source. Review the platform's moderation
@@ -46,7 +46,9 @@ Paradise Edition with Embeddium 0.3.18 and Complementary Reimagined r5.3.
 Replace your existing Oculus JAR, install the matching DH and Embeddium versions,
 and obtain a compatible shader separately. Test a copied instance first.
 This alpha does not claim every feature of modern Oculus/Iris or compatibility
-with every shader. Euphoria Patcher is unsupported; do not combine with OptiFine,
+with every shader. Alpha 4 also tests Complementary Unbound r5.9.3 with Euphoria
+Patcher 1.10.5, including settings edits and DH rendering. Advanced Euphoria
+features remain unverified. Do not combine with OptiFine,
 Iris or another Oculus JAR. See the release's testing matrix for verified behavior.
 
 Based on Iris/Oculus, Teqed's renderer fork and fangyu-mc's DH bridge, with full

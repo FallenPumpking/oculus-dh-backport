@@ -45,8 +45,10 @@ Install only {jar.name} into your copied instance's mods directory.
 Remove/disable the existing Oculus JAR. Never install the source ZIP as a mod.
 Requires Minecraft 1.18.2, Forge 40.3.11 and Embeddium 0.3.18.
 For the advertised shader setup install Distant Horizons 3.3.3 separately.
-Obtain a DH-compatible shader separately; Complementary Reimagined r5.3 was tested.
-Disable Euphoria Patcher and Far Sight for this alpha's test configuration.
+Obtain shaders separately. Alpha 4 tested Complementary Unbound r5.9.3 with
+EuphoriaPatcher 1.10.5-r5.9.3; matching Euphoria Patcher can remain enabled.
+Complementary Reimagined r5.3 was tested previously. Disable Far Sight for testing.
+Advanced Euphoria features and every setting combination are not yet verified.
 Do not combine with OptiFine, Iris, or another Oculus JAR.
 
 Share this complete bundle, or provide the exact GitHub release/source link with

@@ -35,5 +35,7 @@ Maintained by FallenPumpking. Ported rendering, GUI, resource and mixin targets 
 projection/depth handling and framebuffer integration. Optional entity sorting
 is disabled because its injection conflicts with the tested pack.
 Build/release packaging, notices, tests and documentation were added.
+Alpha 4 fixes shader-properties conditional preprocessing and adds regression
+checks for Euphoria-compatible settings loading and whole-identifier constants.
 These modifications and documentation were developed with OpenAI Codex assistance.
 Existing source headers and copyright notices are preserved.

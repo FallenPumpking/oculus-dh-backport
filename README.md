@@ -4,7 +4,8 @@ An unofficial Oculus fork bringing **Distant Horizons 3.3.3 shader rendering to
 Minecraft 1.18.2 on Forge**.
 
 **Alpha — testing in progress.** Verified in a Vault Hunters Paradise Edition
-single-player test world with Complementary Reimagined r5.3. This is not a full
+single-player test world with Complementary Unbound r5.9.3 + Euphoria Patches
+1.10.5 (alpha 4), and previously Complementary Reimagined r5.3. This is not a full
 backport of every feature in modern Oculus or Iris. Report problems here rather
 than to upstream maintainers.
 
@@ -20,7 +21,9 @@ than to upstream maintainers.
 | Loader | Forge 40.3.11 |
 | Renderer | Embeddium 0.3.18 for 1.18.2 |
 | Distant Horizons | 3.3.3 for 1.18.2 |
-| Shader | Complementary Reimagined r5.3 |
+| Shader (alpha 4) | Complementary Unbound r5.9.3 + Euphoria Patches 1.10.5 |
+| Patcher (optional) | EuphoriaPatcher 1.10.5-r5.9.3 for Forge |
+| Previously tested shader | Complementary Reimagined r5.3 |
 | Java | 21.0.9 runtime; Java 17 bytecode |
 
 Other combinations are unverified. Java 21 compatibility depends on the entire
@@ -31,7 +34,8 @@ modpack. This release does not establish that Java 21 or ZGC improves performanc
 1. Back up or duplicate your instance. Install this on the client.
 2. Remove or disable the existing Oculus JAR. Install the release JAR into `mods`.
 3. Install the matching Embeddium and DH versions above from their official pages.
-4. Disable Euphoria Patcher and Far Sight for this alpha's supported test setup.
+4. Disable Far Sight for the tested setup. Euphoria Patcher may remain enabled
+   when using the matching r5.9.3 / 1.10.5 combination above on alpha 4 or newer.
    Do not combine with OptiFine, Iris, or a second Oculus JAR.
 5. Obtain a DH-compatible shader separately and enable it in Video Settings.
 6. Allow DH terrain to build. Test a disposable world before valuable saves.
@@ -46,10 +50,14 @@ The inherited `1.8.1` version prefix does not promise Oculus 1.8.1 feature parit
   distance in a local test world; normal world save and shutdown.
 - Projection-depth and temporal-history helper checks.
 - Successful compilation of the 1.18.2 integration.
+- Alpha 4: Euphoria shader settings open, an option can be changed and saved,
+  and applying settings reloads the shader successfully. Euphoria + DH terrain
+  rendered in the disposable Overworld test with a four-chunk vanilla distance.
 
-Multiplayer, Vault runs, long sessions, shader reload and resize remain on the
+Multiplayer, Vault runs, long sessions, broader reload scenarios and resize remain on the
 [acceptance checklist](docs/TESTING.md). Optional entity sorting is disabled;
-batching remains enabled. Euphoria Patcher is not supported by this alpha.
+batching remains enabled. Advanced Euphoria features and every setting combination
+have not been validated; the test is not a promise of full modern Iris parity.
 There is no broad shader compatibility or FPS claim.
 
 ## Source, licensing and credits

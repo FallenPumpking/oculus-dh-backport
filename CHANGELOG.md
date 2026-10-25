@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.8.1-dh3.3.3-backport.4-alpha — 2026-10-25
+
+- Fix shader-properties preprocessing that erased identifiers inside `defined`,
+  `ifdef` and `ifndef` before conditional evaluation. With Complementary Unbound
+  r5.9.3 + Euphoria 1.10.5 this leaked inactive Photonics configuration, threw
+  `NumberFormatException: PHOTONICS_RENDER_SCALE` and prevented shader settings.
+- Evaluate conditional branches before expanding environment constants, matching
+  whole identifiers so names such as BIOME_FOREST_HILLS are not partially replaced.
+- Add regression checks for empty defines, nested inactive branches and constants.
+- Tested settings edits, apply/reload, in-world Euphoria + DH rendering and normal
+  save/shutdown in the copied Vault Hunters instance. Advanced optional shader
+  features, Vault gameplay and multiplayer remain unverified.
+
 ## 1.8.1-dh3.3.3-backport.3-alpha — 2026-10-25
 
 - Fix startup rejection of the intended Embeddium build: Forge compares its full
