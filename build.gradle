@@ -100,3 +100,13 @@ def projectionTasks = ['ProjectionDepthCheck', 'ProjectionHistoryCheck'].collect
 }
 tasks.register('projectionChecks') { dependsOn projectionTasks }
 tasks.named('check') { dependsOn tasks.named('projectionChecks') }
+
+tasks.register('dependencyMetadataCheck', JavaExec) {
+    dependsOn tasks.named('projectionTestClasses'), tasks.named('remapJar')
+    classpath = sourceSets.projectionTest.runtimeClasspath
+    mainClass = 'net.coderbot.iris.compat.dh.DependencyMetadataCheck'
+    args projectDir.absolutePath,
+         tasks.named('remapJar').get().archiveFile.get().asFile.absolutePath,
+         project.minecraft_version, project.forge_version
+}
+tasks.named('check') { dependsOn tasks.named('dependencyMetadataCheck') }

@@ -18,6 +18,8 @@ Gradle downloads Minecraft, Forge and its toolchain dependencies separately.
 
 `projectionChecks` runs two standalone regression programs; a pass is not a GPU
 or full-game integration test. See TESTING.md for manual acceptance.
+`build` also runs `dependencyMetadataCheck`, which reads the remapped release JAR
+and checks its ranges against the actual dependency JARs with Maven version parsing.
 The source archive includes the Gradle wrapper, build scripts, dependency lock
 and all vendored source. Build timestamps/host differences may affect JAR hashes;
 bit-for-bit reproducible builds are not claimed.

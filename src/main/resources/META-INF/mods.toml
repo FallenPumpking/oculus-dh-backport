@@ -39,6 +39,6 @@ side="CLIENT"
 [[dependencies.oculus]]
 modId="embeddium"
 mandatory=true
-versionRange="[0.3.18]"
+versionRange="[0.3.18+mc1.18.2]"
 ordering="AFTER"
 side="CLIENT"
