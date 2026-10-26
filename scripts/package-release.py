@@ -50,6 +50,8 @@ EuphoriaPatcher 1.10.5-r5.9.3; matching Euphoria Patcher can remain enabled.
 Complementary Reimagined r5.3 was tested previously. Disable Far Sight for testing.
 Alpha 5 corrects terrain lighting and ACT shader compilation. Screen-space
 lighting, ACT at four chunks, and combined mode were tested with DH.
+Alpha 6 isolates selection-outline color state, fixing the first-person
+rainbow outline in the tested Botania/Complementary/Euphoria combination.
 Larger ACT grids and modded light sources remain unverified;
 ACT lighting does not extend across the full DH view distance.
 Do not combine with OptiFine, Iris, or another Oculus JAR.

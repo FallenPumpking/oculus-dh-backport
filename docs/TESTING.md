@@ -18,6 +18,8 @@ Prefer before/after screenshots at the same camera position and settings.
 | Alpha 5: ACT four chunks + DH | Passed colored illumination, DH terrain, save and shutdown, 2026-10-25 |
 | Alpha 5: screen-space colored lighting + DH | Passed colored illumination, DH terrain, save and shutdown, 2026-10-25 |
 | Alpha 5: ACT + screen-space mode + DH | Passed both compiled paths, colored illumination, DH terrain, save and shutdown, 2026-10-25 |
+| Alpha 6 candidate: rainbow block outline | Passed first/third person, empty hand and held book with Unbound/Euphoria/DH, 2026-10-25 |
+| Alpha 6 candidate: outline with ACT and shader toggle | Passed ACT four-chunk settings and shader disable/re-enable, 2026-10-25 |
 | Cold start and repeat world load on packaged release | Pending tester confirmation |
 | Multiplayer connect/disconnect/reconnect | Pending |
 | Vault entry, combat, exit and dimension transitions | Pending |
@@ -26,6 +28,42 @@ Prefer before/after screenshots at the same camera position and settings.
 | Fullscreen toggle, resizing and resource reload | Pending |
 | At least one hour of normal gameplay | Pending |
 | Compare frame times, memory and chunk-generation load | Pending; no benchmark claim |
+
+## Alpha 6 selection-outline check
+
+On 2026-10-25, a copied Vault Hunters Paradise instance reproduced the reported
+faint first-person outline and working third-person rainbow outline. The setup
+used Forge 40.3.11, Embeddium 0.3.18, DH 3.3.3, Botania 1.18.2-435,
+Complementary Unbound r5.9.3 and Euphoria Patches 1.10.5 on Java 21.
+A fixed camera targeted a gray-concrete wall in a disposable creative Overworld.
+The failure also occurred with an empty hand.
+
+Temporary local diagnostics measured black vertex RGBA `(0, 0, 0, 102/255)` in
+both views. First person supplied global modulation `(1, 1, 1, 0.4)`, producing
+alpha 0.16 instead of the 0.4 expected by the shader's outline detection. Third
+person supplied `(1, 1, 1, 1)`. A setter stack trace identified Botania's
+`RenderHelper$AstrolabeLayer` setup during the batched entity flush; inspection
+of that installed class confirmed its setup sets alpha 0.4 and its clear action
+does not restore shader color. This is render-order-dependent state leakage,
+not an invalid saved rainbow setting or shader compilation failure.
+
+The fix gives only the wrapped vanilla outline a neutral shader color while a
+shader pipeline is active, then restores the saved incoming color. Tests passed:
+
+- First-person rainbow with an empty hand and with a held guide book.
+- Third-person rainbow with the same target and settings.
+- Shader reload with the main instance's ACT settings (`COLORED_LIGHTING=128`):
+  rainbow remained visible; one ACT flood-fill compute source and DH GBuffer
+  integration were confirmed, with no targeted shader/GL errors.
+- Disabling shaders returned the ordinary outline; re-enabling restored rainbow.
+- Normal world save and DH database shutdown.
+
+The original shader source was restored byte-for-byte before testing the fix.
+Temporary diagnostic logging and camera controls were removed before packaging;
+they are not part of the distributed mod. The gameplay checks used the same
+outline fix with those local diagnostics present. The distributable is built and
+checked separately. This does not establish compatibility with every custom
+mod outline, Vault gameplay, other dimensions or multiplayer.
 
 ## Alpha 4 Euphoria check
 
