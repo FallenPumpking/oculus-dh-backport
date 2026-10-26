@@ -10,8 +10,16 @@ CurseForge or Modrinth automatically.
    AGPL-3.0-only for the combined distribution and link NOTICE/third-party notices.
 3. Supply an original human-made project avatar (CurseForge minimum 400×400).
    Do not reuse upstream Oculus branding as this project's listing avatar.
-4. Update gradle.properties and CHANGELOG.md, run CI, tag the exact commit.
-5. Run scripts/package-release.py. Publish the JAR, full corresponding-source ZIP,
+4. Prepare version, changelog, notices and test-record changes on a release branch.
+   Open a pull request, pass the required checks, review and squash merge it into
+   `main`. Update the local checkout to the resulting commit, confirm a clean
+   tree, and build/validate that exact commit before tagging it. A PR's pre-merge
+   commit differs from its squash commit; do not label old PR artifacts as builds
+   of the new commit. Documentation-only changes do not need a mod release.
+5. Run scripts/package-release.py from that clean commit. Check the manifest's
+   source commit and hashes, then tag that exact commit with the new version.
+   Never move an existing release tag or replace its artifacts with later code.
+   Publish the JAR, full corresponding-source ZIP,
    tester bundle and SHA256SUMS together in a GitHub prerelease. Keep source available
    for every binary version; do not substitute a moving branch link.
 6. On the selected platform, use Minecraft 1.18.2 / Forge / client environment.
