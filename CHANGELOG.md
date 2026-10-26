@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.8.1-dh3.3.3-backport.6-alpha — candidate
+
+- Isolate the vanilla block-selection outline from global shader-color state
+  left by earlier batched render layers. Save the incoming color, use neutral
+  modulation for the shader outline draw, and restore the saved color afterward.
+- Fix Complementary Unbound's rainbow outline appearing only in third person
+  in the tested Vault Hunters pack. Botania's Astrolabe layer left global alpha
+  at 0.4; multiplying it by the outline's own 0.4 alpha produced 0.16 and failed
+  the shader's outline recognition. No shader-pack edit is required.
+- Validated first/third person, empty hand and a held book, and the main
+  instance's ACT settings with Unbound r5.9.3, Euphoria 1.10.5 and DH 3.3.3.
+  See docs/TESTING.md for scope and remaining acceptance work.
+
 ## 1.8.1-dh3.3.3-backport.5-alpha — 2026-10-25
 
 - Correct terrain light coordinates to match Embeddium 0.3.18's 1.18.2 vertex

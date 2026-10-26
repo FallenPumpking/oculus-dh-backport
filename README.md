@@ -56,6 +56,9 @@ The inherited `1.8.1` version prefix does not promise Oculus 1.8.1 feature parit
 - Alpha 5: corrected terrain block lighting and ACT compute-shader compilation.
   Euphoria screen-space lighting, ACT at four chunks, and ACT + screen-space
   mode render colored illumination while DH draws distant terrain.
+- Alpha 6 candidate: isolate block-selection outline color state, restoring
+  Complementary's rainbow outline in first person with Botania in the tested pack.
+  First/third person and ACT settings were checked with Euphoria and DH enabled.
 
 Multiplayer, Vault runs, long sessions, broader reload scenarios and resize remain on the
 [acceptance checklist](docs/TESTING.md). Optional entity sorting is disabled;
