@@ -76,5 +76,7 @@ the tester bundle which includes both. Source and build scripts are public.
 Based on [Oculus](https://github.com/Asek3/Oculus), [Teqed's fork](https://github.com/Teqed/Oculus),
 [Iris](https://github.com/IrisShaders/Iris), and [fangyu's DH bridge](https://github.com/fangyu-mc/oculus-dh3-compat).
 Not affiliated with or endorsed by those projects or by Mojang/Microsoft.
-Maintained by FallenPumpking with OpenAI Codex assistance on the backport,
-testing automation and documentation. No platform submission has been made.
+Project initiated and maintained by **Fallen PumpKing**. Backport direction and
+testing by Fallen PumpKing, with development assistance from OpenAI Codex.
+Based on Iris/Oculus and the credited upstream contributors.
+No platform submission has been made.

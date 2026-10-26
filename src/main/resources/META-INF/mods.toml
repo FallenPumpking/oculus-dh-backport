@@ -9,10 +9,12 @@ displayName="Oculus DH Backport (Alpha)"
 displayURL="https://github.com/FallenPumpking/oculus-dh-backport"
 logoFile="oculus-logo.png"
 authors="coderbot, IMS212, Justsnoopy30, FoundationGames"
-credits="Oculus by Asek3; 1.19.2 base by Teqed; DH3 bridge by fangyu-mc. See BACKPORT-NOTES.txt for local modifications."
+credits="Project initiated and maintained by Fallen PumpKing. Backport direction and testing by Fallen PumpKing, with development assistance from OpenAI Codex. Oculus by Asek3; 1.19.2 base by Teqed; DH3 bridge by fangyu-mc. See BACKPORT-NOTES.txt for local modifications."
 description='''
 Experimental local backport for Minecraft 1.18.2, Forge and Distant Horizons 3.3.3.
 Based on Iris/Oculus and the fangyu-mc DH3 bridge. Not an official upstream release.
+Project initiated and maintained by Fallen PumpKing.
+Backport direction and testing by Fallen PumpKing, with development assistance from OpenAI Codex.
 '''
 
 [[dependencies.oculus]]
