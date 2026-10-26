@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.1-dh3.3.3-backport.5-alpha — 2026-10-25
+
+- Correct terrain light coordinates to match Embeddium 0.3.18's 1.18.2 vertex
+  binding. The newer donor renderer declared an integer shader attribute while
+  this target supplies float-converted unsigned shorts. This mismatch corrupted
+  block-light values and was exposed by the nighttime Euphoria lighting test.
+- Keep core-profile `vaUV2` semantics through an explicit integer conversion
+  after reading the float attribute. Add a regression check for both paths.
+
 ## 1.8.1-dh3.3.3-backport.4-alpha — 2026-10-25
 
 - Fix shader-properties preprocessing that erased identifiers inside `defined`,

@@ -134,7 +134,7 @@ public class SodiumTransformer {
 				// translated from sodium's chunk_vertex.glsl
 				"vec3 _vert_position;",
 				"vec2 _vert_tex_diffuse_coord;",
-				"ivec2 _vert_tex_light_coord;",
+				"vec2 _vert_tex_light_coord;",
 				"vec4 _vert_color;",
 				"uint _draw_id;",
 				"void _vert_init() {" +
@@ -155,7 +155,9 @@ public class SodiumTransformer {
 		addIfNotExists(root, t, tree, "a_PosId", Type.F32VEC4, StorageQualifier.StorageType.IN);
 		addIfNotExists(root, t, tree, "a_TexCoord", Type.F32VEC2, StorageQualifier.StorageType.IN);
 		addIfNotExists(root, t, tree, "a_Color", Type.F32VEC4, StorageQualifier.StorageType.IN);
-		addIfNotExists(root, t, tree, "a_LightCoord", Type.I32VEC2, StorageQualifier.StorageType.IN);
+		// Embeddium 0.3.18 on 1.18.2 binds this unsigned-short attribute with
+		// glVertexAttribPointer (float conversion), not glVertexAttribIPointer.
+		addIfNotExists(root, t, tree, "a_LightCoord", Type.F32VEC2, StorageQualifier.StorageType.IN);
 		tree.prependMainFunctionBody(t, "_vert_init();");
 	}
 

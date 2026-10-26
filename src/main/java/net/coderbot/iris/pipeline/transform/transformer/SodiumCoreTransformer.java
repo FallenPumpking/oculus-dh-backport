@@ -27,7 +27,9 @@ public class SodiumCoreTransformer {
 			root.rename("vaNormal", "iris_Normal");
 			root.replaceReferenceExpressions(t, "vaUV0", "_vert_tex_diffuse_coord");
 			root.replaceReferenceExpressions(t, "vaUV1", "ivec2(0, 10)");
-			root.rename("vaUV2", "a_LightCoord");
+			// Core-profile packs expect integer light coordinates; convert after
+			// receiving the float attribute supplied by the 1.18.2 renderer.
+			root.replaceReferenceExpressions(t, "vaUV2", "ivec2(a_LightCoord)");
 
 			root.replaceReferenceExpressions(t, "textureMatrix", "mat4(1.0)");
 

@@ -91,7 +91,7 @@ sourceSets {
         runtimeClasspath += output + compileClasspath
     }
 }
-def projectionTasks = ['ProjectionDepthCheck', 'ProjectionHistoryCheck', 'PropertiesConditionCheck'].collect { checkClass ->
+def projectionTasks = ['ProjectionDepthCheck', 'ProjectionHistoryCheck', 'PropertiesConditionCheck', 'TerrainLightAttributeCheck'].collect { checkClass ->
     tasks.register(checkClass, JavaExec) {
         dependsOn tasks.named('projectionTestClasses')
         classpath = sourceSets.projectionTest.runtimeClasspath

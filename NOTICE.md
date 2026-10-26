@@ -37,5 +37,8 @@ is disabled because its injection conflicts with the tested pack.
 Build/release packaging, notices, tests and documentation were added.
 Alpha 4 fixes shader-properties conditional preprocessing and adds regression
 checks for Euphoria-compatible settings loading and whole-identifier constants.
+Alpha 5 corrects the terrain light-coordinate attribute type for Embeddium's
+1.18.2 float-converting binding, including integer conversion for core shaders,
+and adds a shader transformation regression check.
 These modifications and documentation were developed with OpenAI Codex assistance.
 Existing source headers and copyright notices are preserved.
