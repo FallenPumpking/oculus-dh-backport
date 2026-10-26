@@ -30,7 +30,11 @@ See LICENSE, LICENSES/, THIRD_PARTY_NOTICES.md and docs/LICENSE-AUDIT.md.
 
 ## Local modifications, 2026-10-25
 
-Maintained by FallenPumpking. Ported rendering, GUI, resource and mixin targets to
+Project initiated and maintained by Fallen PumpKing. Backport direction and
+testing by Fallen PumpKing, with development assistance from OpenAI Codex.
+Based on Iris/Oculus and the credited upstream contributors.
+
+Ported rendering, GUI, resource and mixin targets to
 1.18.2; adapted DH 3.3.3 rendering hooks; added DH shader programs, uniforms,
 projection/depth handling and framebuffer integration. Optional entity sorting
 is disabled because its injection conflicts with the tested pack.
