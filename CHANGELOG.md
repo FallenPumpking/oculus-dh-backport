@@ -8,6 +8,14 @@
   block-light values and was exposed by the nighttime Euphoria lighting test.
 - Keep core-profile `vaUV2` semantics through an explicit integer conversion
   after reading the float attribute. Add a regression check for both paths.
+- Forward the resolved shader feature macros into GLSL preprocessing. A stale
+  snapshot omitted `IRIS_FEATURE_CUSTOM_IMAGES`, stripping ACT's sampler and
+  color declarations and causing `shadowcomp.csh` compilation to fail.
+- Tested Euphoria screen-space colored lighting, ACT at four chunks and their
+  combined mode with Complementary Unbound r5.9.3, Euphoria 1.10.5 and DH 3.3.3
+  in the copied Vault Hunters instance. Colored illumination, distant terrain
+  and normal save/shutdown passed. Larger ACT grids and modded lights remain
+  unverified; ACT does not trace lighting across the full DH view distance.
 
 ## 1.8.1-dh3.3.3-backport.4-alpha — 2026-10-25
 

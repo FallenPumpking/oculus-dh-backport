@@ -239,8 +239,10 @@ public class ShaderPack {
 		IncludeProcessor includeProcessor = new IncludeProcessor(graph);
 
 		// Set up our source provider for creating ProgramSets
-		ArrayList<StringPair> finalEnvironmentDefines1 = new ArrayList<>((Collection) finalEnvironmentDefines);
-		finalEnvironmentDefines1.addAll(IrisDefines.createIrisReplacements());
+		// Use the resolved environment, including supported optional feature flags.
+		// The earlier properties snapshot predates IRIS_FEATURE_CUSTOM_IMAGES/SSBO.
+		ImmutableList<StringPair> sourceEnvironmentDefines = ImmutableList.<StringPair>builder()
+				.addAll(environmentDefines).addAll(replacements).build();
 		this.sourceProvider = (path) -> {
 			String pathString = path.getPathString();
 			// Removes the first "/" in the path if present, and the file
@@ -272,7 +274,7 @@ public class ShaderPack {
 			// directly. This removes one obstacle to accurate reporting of line numbers for errors,
 			// though there exist many more (such as relocating all #extension directives and similar things)
 			String source = builder.toString();
-			source = JcppProcessor.glslPreprocessSource(source, finalEnvironmentDefines1);
+			source = JcppProcessor.glslPreprocessSource(source, sourceEnvironmentDefines);
 
 			return source;
 		};

@@ -46,9 +46,11 @@ Paradise Edition with Embeddium 0.3.18 and Complementary Reimagined r5.3.
 Replace your existing Oculus JAR, install the matching DH and Embeddium versions,
 and obtain a compatible shader separately. Test a copied instance first.
 This alpha does not claim every feature of modern Oculus/Iris or compatibility
-with every shader. Alpha 4 also tests Complementary Unbound r5.9.3 with Euphoria
-Patcher 1.10.5, including settings edits and DH rendering. Advanced Euphoria
-features remain unverified. Do not combine with OptiFine,
+with every shader. Complementary Unbound r5.9.3 with Euphoria Patcher 1.10.5
+was tested for settings edits and DH rendering. Alpha 5 tests screen-space colored
+lighting, ACT at four chunks, and their combined mode with DH. Larger ACT grids
+and modded light sources remain unverified.
+ACT lighting does not extend across the full DH view distance. Do not combine with OptiFine,
 Iris or another Oculus JAR. See the release's testing matrix for verified behavior.
 
 Based on Iris/Oculus, Teqed's renderer fork and fangyu-mc's DH bridge, with full

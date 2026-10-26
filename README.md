@@ -5,7 +5,7 @@ Minecraft 1.18.2 on Forge**.
 
 **Alpha — testing in progress.** Verified in a Vault Hunters Paradise Edition
 single-player test world with Complementary Unbound r5.9.3 + Euphoria Patches
-1.10.5 (alpha 4), and previously Complementary Reimagined r5.3. This is not a full
+1.10.5 (alpha 5), and previously Complementary Reimagined r5.3. This is not a full
 backport of every feature in modern Oculus or Iris. Report problems here rather
 than to upstream maintainers.
 
@@ -21,7 +21,7 @@ than to upstream maintainers.
 | Loader | Forge 40.3.11 |
 | Renderer | Embeddium 0.3.18 for 1.18.2 |
 | Distant Horizons | 3.3.3 for 1.18.2 |
-| Shader (alpha 4) | Complementary Unbound r5.9.3 + Euphoria Patches 1.10.5 |
+| Shader (alpha 5) | Complementary Unbound r5.9.3 + Euphoria Patches 1.10.5 |
 | Patcher (optional) | EuphoriaPatcher 1.10.5-r5.9.3 for Forge |
 | Previously tested shader | Complementary Reimagined r5.3 |
 | Java | 21.0.9 runtime; Java 17 bytecode |
@@ -53,11 +53,16 @@ The inherited `1.8.1` version prefix does not promise Oculus 1.8.1 feature parit
 - Alpha 4: Euphoria shader settings open, an option can be changed and saved,
   and applying settings reloads the shader successfully. Euphoria + DH terrain
   rendered in the disposable Overworld test with a four-chunk vanilla distance.
+- Alpha 5: corrected terrain block lighting and ACT compute-shader compilation.
+  Euphoria screen-space lighting, ACT at four chunks, and ACT + screen-space
+  mode render colored illumination while DH draws distant terrain.
 
 Multiplayer, Vault runs, long sessions, broader reload scenarios and resize remain on the
 [acceptance checklist](docs/TESTING.md). Optional entity sorting is disabled;
-batching remains enabled. Advanced Euphoria features and every setting combination
-have not been validated; the test is not a promise of full modern Iris parity.
+batching remains enabled. Larger ACT grids, modded light sources and other
+untested settings remain unverified. ACT lights nearby terrain; this does not
+extend color tracing across the full DH distance. The test is not a promise of
+full modern Iris parity.
 There is no broad shader compatibility or FPS claim.
 
 ## Source, licensing and credits
